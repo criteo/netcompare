@@ -21,8 +21,10 @@ It should work with all Cisco IOS style kind of configuration files.
 Comparison algorithm
 --------------------
 The script does the work in two pass:
+
 1. For each line of the origin configuration file, check if this line is present in the target file. If not, we assume that we need to prefix this line with "no" and add it in our resulting command list.
 2. For each line of the target configuration file, check if this line is present in the origin file. If not, we assume that we need this line in our resulting command list.
+
 Then, we sort the two resulting lists to be sure that "no" commands are placed before new commands.
 
 That's the basics. We'll do a detailed diagram to explain everything in a near future.
@@ -30,6 +32,7 @@ That's the basics. We'll do a detailed diagram to explain everything in a near f
 Limitations
 -----------
 There's no black magic in this script, it can't invent commands, so be careful with implicit configurations.
+
 Don't forget to yell at your favorite vendor's representatives about their bad CLI and lack of API.
 
 How-to
@@ -39,9 +42,9 @@ That's quite simple, call netcompare.py with 3 arguments:
  * The target configuration file
  * The negation keyword used by your platform. Cisco IOS, NXOS, IOS-XR, ASA uses "no", Huawei uses "undo" for example
 
-``
+```
     python netcompare.py tests/sample1.conf tests/sample2.conf no
-``
+```
 
 The script returns an ordered list of commands that can be applied to the network equipment in order to achieve the target configuration state.
 
@@ -51,9 +54,9 @@ netcompare uses the awesome David Michael Pennington's CiscoConfParse library to
 More information in [CiscoConfParse](http://www.pennington.net/py/ciscoconfparse/) documentation.
 Be sure to install it before using netcompare:
 
-``
+```
     pip install ciscoconfparse
-``
+```
 
 Documentation
 =============
