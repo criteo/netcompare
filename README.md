@@ -39,11 +39,9 @@ That's quite simple, call netcompare.py with 3 arguments:
  * The target configuration file
  * The negation keyword used by your platform. Cisco IOS, NXOS, IOS-XR, ASA uses "no", Huawei uses "undo" for example
 
-``
 
     python netcompare.py tests/sample1.conf tests/sample2.conf no
 
-``
 
 The script returns an ordered list of commands that can be applied to the network equipment in order to achieve the target configuration state.
 
@@ -53,11 +51,9 @@ netcompare uses the awesome David Michael Pennington's CiscoConfParse library to
 More information in [CiscoConfParse](http://www.pennington.net/py/ciscoconfparse/) documentation.
 Be sure to install it before using netcompare:
 
-``
 
     pip install ciscoconfparse
 
-``
 
 Documentation
 =============
