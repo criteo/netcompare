@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # Copyright 2015 Criteo. All rights reserved.
 #
 # The contents of this file are licensed under the Apache License, Version 2.0

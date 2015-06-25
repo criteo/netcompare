@@ -7,14 +7,14 @@ This script has been written with network configuration automation in mind, for 
 Known to work with
 ------------------
  * Cisco IOS
- * Cisco NXOS
  * Cisco ASA
  * Dell FTOS
  * Huawei VRP
 
 It can also work with these platforms (but they support -at least partially- atomic changes, so there's a better way):
- * Arista EOS
- * Cisco IOS XR
+ * Arista EOS (configuration sessions with commit supported in modern EOS releases)
+ * Cisco NXOS (you can implement pseudo atomic methods with configuration checkpoints and "rollback-patch" command)
+ * Cisco IOS XR (supports commit with limitations on object renaming)
 
 It should work with all Cisco IOS style kind of configuration files.
 
