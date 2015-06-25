@@ -4,6 +4,8 @@ netcompare is a python script that compares two Cisco IOS style's configuration 
 It's like a "diff" on steroids, which takes care of command's parent / child relationships.
 This script has been written with network configuration automation in mind, for crappy network equipments that does not support atomic changes.
 
+[![Build Status](https://travis-ci.org/criteo/netcompare.png?branch=master)](https://travis-ci.org/criteo/netcompare)
+
 Known to work with
 ------------------
  * Cisco IOS
