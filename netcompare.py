@@ -118,11 +118,11 @@ def compare_children(obj_origin, obj_target):
         match = obj_target.find_objects_w_parents(
             obj_origin.text,
             '^'+re.escape(child.text)+'$')
-        if len(match) == 0:
-            command_list.append(child.text)
-        elif len(child.children) > 0:
+        if len(child.children) > 0:
             for result_recursive in compare_children(child, obj_target):
                 command_list.append(result_recursive)
+        elif len(match) == 0:
+            command_list.append(child.text)
     if len(command_list) > 1:
         return command_list
     else:
@@ -188,8 +188,7 @@ def netcompare(origin, target, no_command):
             if len(line.children) > 0 and len(parent_match) != 0:
                 result_comparison = compare_children(line, origin_file)
                 if len(result_comparison) > 0:
-                    diff_add_commands.append(
-                        compare_children(line, origin_file))
+                    diff_add_commands.append( result_comparison )
     return merge_commands(diff_add_no_commands, diff_add_commands)
 
 
