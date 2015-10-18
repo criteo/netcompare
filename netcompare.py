@@ -111,7 +111,6 @@ def compare_children_prefix_no(obj_origin, obj_target, no_command):
     else:
         return []
 
-
 def compare_children(obj_origin, obj_target):
     command_list = [obj_origin.text]
     for child in obj_origin.children:
@@ -121,13 +120,15 @@ def compare_children(obj_origin, obj_target):
         if len(child.children) > 0:
             for result_recursive in compare_children(child, obj_target):
                 command_list.append(result_recursive)
-        elif len(match) == 0:
-            command_list.append(child.text)
+        for child_match in match:
+             if child_match.geneology == child.geneology:
+               break
+        else:
+             command_list.append(child.text)
     if len(command_list) > 1:
         return command_list
     else:
         return []
-
 
 def merge_commands(list1, list2):
     command_list = []
