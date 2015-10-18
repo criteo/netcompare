@@ -121,7 +121,7 @@ def compare_children(obj_origin, obj_target):
             for result_recursive in compare_children(child, obj_target):
                 command_list.append(result_recursive)
         for child_match in match:
-             if child_match.geneology == child.geneology:
+             if child_match.geneology_text == child.geneology_text:
                break
         else:
              command_list.append(child.text)
