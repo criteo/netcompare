@@ -19,7 +19,6 @@ import sys
 import re
 import os
 import yaml
-import pprint
 
 
 def cli_parser():

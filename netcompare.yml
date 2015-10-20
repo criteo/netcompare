@@ -1,10 +1,10 @@
-cisco:
+ios:
   no_command: "no"
   CiscoConfParse_syntax: ios
   dont_compare:
     - "ntp clock-period"
     - "Current Configuration ..."
-huawei:
+vrp:
   no_command: "undo"
   CiscoConfParse_syntax: ios
   dont_compare:
