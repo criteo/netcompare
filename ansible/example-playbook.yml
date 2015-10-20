@@ -10,7 +10,7 @@
       netcompare:
         origin: "../tests/sample1.conf"
         target: "../tests/sample2.conf"
-        vendor: "cisco"
+        vendor: "ios"
       register: comparison_result
       delegate_to: localhost
 
