@@ -86,55 +86,57 @@ def clean_file(file, vendor):
                     list_clean.append(line.rstrip(' \t\r\n\0'))
     return list_clean
 
-def print_line(d,depth=0):
+def print_one_line(line,vendor):
+    if line[0] == 'NO':
+        line_text_without_no = re.match("^(\s*)(.*)", line[1])
+        cmd = line_text_without_no.group(1) + config[vendor]['no_command'] + " " + line_text_without_no.group(2)
+	print ("%s" % cmd)
+    else:
+	print ("%s" % line[1])
+
+def print_line(d,vendor,depth=0):
     for k,v in sorted(d.items(),key=lambda x: x[0]):
+    #for k,v in d:
         if isinstance(v, dict):
-            print ("%s" % k)
-            print_line(v,depth+1)
+            print_one_line(k,vendor)
+            print_line(v,vendor,depth+1)
         else:
-            print "%s %s" % (k, v)
+            print "%s %s" % (k[0], v)   #never go here
 
 def netcompare(origin, target, vendor):
     origin_file = CiscoConfParse(origin, syntax=config[vendor]['CiscoConfParse_syntax'], factory=False)
     target_file = CiscoConfParse(target, syntax=config[vendor]['CiscoConfParse_syntax'], factory=False)
     result = {}
+    for line_target in target_file.objs:
+        for line_origin in origin_file.objs:
+            if line_origin.geneology_text == line_target.geneology_text:
+                break
+	else:   #Delete needed
+            pointer = result
+            index = len(line_target.geneology_text)
+            for cmd in line_target.geneology_text:
+                index = index - 1
+                if ('NO',cmd) in pointer:
+			break
+                if ('_CR',cmd) in pointer:
+                        pointer = pointer.get(('_CR',cmd))
+		elif index == 0:
+                        pointer[('NO',cmd)] = {}
+                        pointer = pointer.get(('NO',cmd))
+		else:
+                        pointer[('_CR',cmd)] = {}
+                        pointer = pointer.get(('_CR',cmd))
     for line_origin in origin_file.objs:
         find = 0
         for line_target in target_file.objs:
             if line_origin.geneology_text == line_target.geneology_text:
-		find = find + 1
-	if find == 0:
+		find = 1
+	if find == 0: #Create needed
             pointer = result
             for cmd in line_origin.geneology_text:
-                if not cmd in pointer:
-                    pointer[cmd] = {}
-                pointer = pointer.get(cmd)
-    for line_target in target_file.objs:
-        find = 0
-        for line_origin in origin_file.objs:
-            if line_origin.geneology_text == line_target.geneology_text:
-		find = find + 1
-	if find == 0:
-            pointer = result
-            size = len(line_target.geneology_text)
-            for cmd in line_target.geneology_text:
-                size = size - 1
-                if re.match("(\s*)(.*)", cmd):
-                	line_text_without_no = re.match("^(\s*)(.*)", cmd)
-                        cmd_no = line_text_without_no.group(1) + config[vendor]['no_command'] + " " + line_text_without_no.group(2)
-                        if cmd_no in pointer:
-                        	break
-                if not cmd in pointer and size == (len(line_target.geneology_text) - 1):
-                        pointer[cmd] = {}
-                if not cmd in pointer:
-                     	if not re.match(config[vendor]['no_command'] + "\s.*", cmd):
-                        	line_text_without_no = re.match("^(\s*)(.*)", cmd)
-                     		cmd = line_text_without_no.group(1) + config[vendor]['no_command'] + " " + line_text_without_no.group(2)
-                     	elif re.match(config[vendor]['no_command'] + "\s.*", cmd):
-                        	line_text_without_no = re.match(config[vendor]['no_command'] + "\s(.*)", cmd)
-                        	cmd = line_text_without_no.group(1)
-                        pointer[cmd] = {}
-                pointer = pointer.get(cmd)
+                if not ('_CR',cmd) in pointer:
+                    pointer[('_CR',cmd)] = {}
+                pointer = pointer.get(('_CR',cmd))
     return result
 
 
@@ -148,7 +150,7 @@ def main():
     target_list = clean_file(args.target, args.vendor)
 
     display_commands = netcompare(origin_list, target_list, args.vendor)
-    print_line(display_commands)
+    print_line(display_commands,args.vendor)
     
 
 if __name__ == '__main__':
