@@ -1,0 +1,16 @@
+cisco:
+  no_command: "no"
+  CiscoConfParse_syntax: ios
+  dont_compare:
+    - "ntp clock-period"
+    - "Current Configuration ..."
+huawei:
+  no_command: "undo"
+  CiscoConfParse_syntax: ios
+  dont_compare:
+    - "password"
+f5:
+  no_command: delete
+  CiscoConfParse_syntax: junos
+  dont_compare:
+    - "vs-index"
