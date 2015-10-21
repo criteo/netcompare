@@ -13,29 +13,30 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
-import py.test
-from netcompare import *
 import os
 
-def compare(test_dir, vendor, capsys):
-    with open('netcompare.yml', 'r') as f:
-        config = yaml.load(f)
+import pytest
 
-    origin_list = clean_file(test_dir + 'origin.conf', vendor, config)
-    target_list = clean_file(test_dir + 'target.conf', vendor, config)
+from netcompare import main
 
-    display_commands = netcompare(origin_list, target_list, vendor, config)
 
-    with open(test_dir + 'result.txt') as file_opened:
+@pytest.fixture
+def data_dir():
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+
+
+def pytest_generate_tests(metafunc):
+    dir = os.listdir(data_dir())
+    metafunc.parametrize("directory", dir)
+
+
+def test_assert(capsys, directory, data_dir):
+    origin = os.path.join(data_dir, directory, 'origin.conf')
+    target = os.path.join(data_dir, directory, 'target.conf')
+    vendor = directory.split('_', 1)[0]
+    result = os.path.join(data_dir, directory, 'result.txt')
+    main([origin, target, vendor])
+    with open(result) as file_opened:
         result = file_opened.read()
-    print_line(display_commands, vendor, config)
     out, err = capsys.readouterr()
     assert result == out
-
-def test(capsys):
-    test_directories = next(os.walk('tests/'))[1]
-
-    for directory in test_directories:
-        test_dir = 'tests/' + directory + '/'
-        vendor = re.search('^([a-zA-Z0-9]*)_.*', directory).group(1)
-        compare(test_dir, vendor, capsys)

@@ -21,7 +21,7 @@ import os
 import yaml
 
 
-def cli_parser():
+def cli_parser(argv=None):
     parser = argparse.ArgumentParser(
         description=('Generating configuration commands by finding differences'
                      ' between two Cisco IOS style configuration files'))
@@ -31,7 +31,7 @@ def cli_parser():
                         type=str, help='Target configuration file')
     parser.add_argument('vendor', metavar='Vendor or OS definition',
                         type=str, help='vendor')
-    return parser.parse_args()
+    return parser.parse_args(argv)
 
 def clean_file(file, vendor, config):
     with open(file) as file_opened:
@@ -140,15 +140,15 @@ def netcompare(origin, target, vendor, config):
     return result
 
 
-def main():
-    args = cli_parser()
+def main(argv=None):
+    args = cli_parser(argv)
     with open('netcompare.yml', 'r') as f:
         config = yaml.load(f)
 
-    origin_list = clean_file(args.origin, args.vendor)
-    target_list = clean_file(args.target, args.vendor)
+    origin_list = clean_file(args.origin, args.vendor, config)
+    target_list = clean_file(args.target, args.vendor, config)
 
-    display_commands = netcompare(origin_list, target_list, args.vendor)
+    display_commands = netcompare(origin_list, target_list, args.vendor, config)
     print_line(display_commands,args.vendor, config)
 
 

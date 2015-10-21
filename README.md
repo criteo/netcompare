@@ -12,6 +12,7 @@ Known to work with
  * Cisco ASA
  * Dell FTOS
  * Huawei VRP
+ * F5 BigIP LTM
 
 It can also work with these platforms (but they support -at least partially- atomic changes, so there's a better way):
  * Arista EOS (configuration sessions with commit supported in modern EOS releases)
@@ -42,10 +43,13 @@ How-to
 That's quite simple, call netcompare.py with 3 arguments:
  * The origin configuration file
  * The target configuration file
- * The negation keyword used by your platform. Cisco IOS, NXOS, IOS-XR, ASA uses "no", Huawei uses "undo" for example
+ * The OS/Vendor of the equipment's configuration file. It can be for now:
+  * ios: for Cisco IOS-style configurations (Cisco IOS, Dell)
+  * vrp: for Huawei VRP-style configurations
+  * f5: for F5 BigIP LTM-style configurations
 
 ```
-    python netcompare.py tests/sample1.conf tests/sample2.conf no
+    python netcompare.py tests/ios_1/origin.conf tests/ios_1/target.conf ios
 ```
 
 The script returns an ordered list of commands that can be applied to the network equipment in order to achieve the target configuration state.
@@ -76,3 +80,4 @@ Pull requests are warmly welcome :)
 Authors
 =======
  * François Fanuel ([f.fanuel@criteo.com](mailto:f.fanuel@criteo.com))
+ * Cédric Paillet ([c.paillet@criteo.com](mailto:c.paillet@criteo.com))
