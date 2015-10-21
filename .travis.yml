@@ -4,6 +4,7 @@ python:
   - "2.7"
 before_install:
   - pip install codecov
+  - pip install pytest-cov
 install:
   - "pip install -r requirements.txt"
 script:
