@@ -29,11 +29,11 @@ def cli_parser():
                         type=str, help='Origin configuration file')
     parser.add_argument('target', metavar='target',
                         type=str, help='Target configuration file')
-    parser.add_argument('vendor', metavar='vendor',
+    parser.add_argument('vendor', metavar='Vendor or OS definition',
                         type=str, help='vendor')
     return parser.parse_args()
 
-def clean_file(file, vendor):
+def clean_file(file, vendor, config):
     with open(file) as file_opened:
         list = file_opened.readlines()
 
@@ -86,7 +86,7 @@ def clean_file(file, vendor):
                     list_clean.append(line.rstrip(' \t\r\n\0'))
     return list_clean
 
-def print_one_line(line,vendor):
+def print_one_line(line, vendor, config):
     if line[0] == 'NO':
         line_text_without_no = re.match("^(\s*)(.*)", line[1])
         cmd = line_text_without_no.group(1) + config[vendor]['no_command'] + " " + line_text_without_no.group(2)
@@ -94,16 +94,16 @@ def print_one_line(line,vendor):
     else:
 	print ("%s" % line[1])
 
-def print_line(d,vendor,depth=0):
+def print_line(d, vendor, config, depth=0):
     for k,v in sorted(d.items(),key=lambda x: x[0]):
     #for k,v in d:
         if isinstance(v, dict):
-            print_one_line(k,vendor)
-            print_line(v,vendor,depth+1)
+            print_one_line(k,vendor, config)
+            print_line(v,vendor, config, depth+1)
         else:
             print "%s %s" % (k[0], v)   #never go here
 
-def netcompare(origin, target, vendor):
+def netcompare(origin, target, vendor, config):
     origin_file = CiscoConfParse(origin, syntax=config[vendor]['CiscoConfParse_syntax'], factory=False)
     target_file = CiscoConfParse(target, syntax=config[vendor]['CiscoConfParse_syntax'], factory=False)
     result = {}
@@ -142,7 +142,6 @@ def netcompare(origin, target, vendor):
 
 def main():
     args = cli_parser()
-    global config
     with open('netcompare.yml', 'r') as f:
         config = yaml.load(f)
 
@@ -150,8 +149,8 @@ def main():
     target_list = clean_file(args.target, args.vendor)
 
     display_commands = netcompare(origin_list, target_list, args.vendor)
-    print_line(display_commands,args.vendor)
-    
+    print_line(display_commands,args.vendor, config)
+
 
 if __name__ == '__main__':
     main()
