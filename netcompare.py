@@ -13,12 +13,14 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
-import argparse
-from ciscoconfparse import CiscoConfParse
+import os
 import sys
 import re
-import os
+
+import argparse
 import yaml
+
+from ciscoconfparse import CiscoConfParse
 
 
 def cli_parser(argv=None):
@@ -33,13 +35,14 @@ def cli_parser(argv=None):
                         type=str, help='vendor')
     return parser.parse_args(argv)
 
+
 def clean_file(file, vendor, config):
     with open(file) as file_opened:
         list = file_opened.readlines()
 
     list_clean = []
 
-    if vendor == 'huawei':
+    if vendor == 'vrp':
         line_parent_sharp = False
         for line in list:
             line_clean = line.rstrip(' \t\r\n\0')
@@ -86,57 +89,69 @@ def clean_file(file, vendor, config):
                     list_clean.append(line.rstrip(' \t\r\n\0'))
     return list_clean
 
+
 def print_one_line(line, vendor, config):
     if line[0] == 'NO':
         line_text_without_no = re.match("^(\s*)(.*)", line[1])
-        cmd = line_text_without_no.group(1) + config[vendor]['no_command'] + " " + line_text_without_no.group(2)
-	print ("%s" % cmd)
+        cmd = (line_text_without_no.group(1) +
+               config[vendor]['no_command'] +
+               " " +
+               line_text_without_no.group(2))
+        print ("%s" % cmd)
     else:
-	print ("%s" % line[1])
+        print ("%s" % line[1])
+
 
 def print_line(d, vendor, config, depth=0):
-    for k,v in sorted(d.items(),key=lambda x: x[0]):
-    #for k,v in d:
+    for k, v in sorted(d.items(), key=lambda x: x[0]):
         if isinstance(v, dict):
-            print_one_line(k,vendor, config)
-            print_line(v,vendor, config, depth+1)
+            print_one_line(k, vendor, config)
+            print_line(v, vendor, config, depth+1)
         else:
-            print "%s %s" % (k[0], v)   #never go here
+            print "%s %s" % (k[0], v)   # never go here
+
 
 def netcompare(origin, target, vendor, config):
-    origin_file = CiscoConfParse(origin, syntax=config[vendor]['CiscoConfParse_syntax'], factory=False)
-    target_file = CiscoConfParse(target, syntax=config[vendor]['CiscoConfParse_syntax'], factory=False)
+    origin_file = (CiscoConfParse(origin,
+                   syntax=config[vendor]['CiscoConfParse_syntax'],
+                   factory=False))
+    target_file = (CiscoConfParse(target,
+                   syntax=config[vendor]['CiscoConfParse_syntax'],
+                   factory=False))
+
     result = {}
-    for line_target in target_file.objs:
-        for line_origin in origin_file.objs:
-            if line_origin.geneology_text == line_target.geneology_text:
-                break
-	else:   #Delete needed
-            pointer = result
-            index = len(line_target.geneology_text)
-            for cmd in line_target.geneology_text:
-                index = index - 1
-                if ('NO',cmd) in pointer:
-			break
-                if ('_CR',cmd) in pointer:
-                        pointer = pointer.get(('_CR',cmd))
-		elif index == 0:
-                        pointer[('NO',cmd)] = {}
-                        pointer = pointer.get(('NO',cmd))
-		else:
-                        pointer[('_CR',cmd)] = {}
-                        pointer = pointer.get(('_CR',cmd))
+
     for line_origin in origin_file.objs:
-        find = 0
         for line_target in target_file.objs:
             if line_origin.geneology_text == line_target.geneology_text:
-		find = 1
-	if find == 0: #Create needed
+                break
+        else:   # Delete needed
             pointer = result
+            index = len(line_origin.geneology_text)
             for cmd in line_origin.geneology_text:
-                if not ('_CR',cmd) in pointer:
-                    pointer[('_CR',cmd)] = {}
-                pointer = pointer.get(('_CR',cmd))
+                index = index - 1
+                if ('NO', cmd) in pointer:
+                    break
+                if ('_CR', cmd) in pointer:
+                    pointer = pointer.get(('_CR', cmd))
+                elif index == 0:
+                    pointer[('NO', cmd)] = {}
+                    pointer = pointer.get(('NO', cmd))
+                else:
+                    pointer[('_CR', cmd)] = {}
+                    pointer = pointer.get(('_CR', cmd))
+
+    for line_target in target_file.objs:
+        find = 0
+        for line_origin in origin_file.objs:
+            if line_origin.geneology_text == line_target.geneology_text:
+                find = 1
+        if find == 0:  # Create needed
+            pointer = result
+            for cmd in line_target.geneology_text:
+                if not ('_CR', cmd) in pointer:
+                    pointer[('_CR', cmd)] = {}
+                pointer = pointer.get(('_CR', cmd))
     return result
 
 
@@ -148,8 +163,9 @@ def main(argv=None):
     origin_list = clean_file(args.origin, args.vendor, config)
     target_list = clean_file(args.target, args.vendor, config)
 
-    display_commands = netcompare(origin_list, target_list, args.vendor, config)
-    print_line(display_commands,args.vendor, config)
+    display_commands = netcompare(origin_list,
+                                  target_list, args.vendor, config)
+    print_line(display_commands, args.vendor, config)
 
 
 if __name__ == '__main__':

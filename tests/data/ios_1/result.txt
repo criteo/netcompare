@@ -1,8 +1,8 @@
-no hostname Bar
-hostname Foo
+no hostname Foo
+hostname Bar
 interface ATM0/0.32 point-to-point
  pvc 0/32
-  tata
+  no tata
 interface FastEthernet0/0
- no ip address 172.16.2.2 255.255.255.0
- ip address 172.16.2.1 255.255.255.0
+ no ip address 172.16.2.1 255.255.255.0
+ ip address 172.16.2.2 255.255.255.0
