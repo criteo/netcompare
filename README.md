@@ -49,7 +49,7 @@ That's quite simple, call netcompare.py with 3 arguments:
   * f5: for F5 BigIP LTM-style configurations
 
 ```
-    python netcompare.py tests/ios_1/origin.conf tests/ios_1/target.conf ios
+    python netcompare.py tests/data/ios_1/origin.conf tests/data/ios_1/target.conf ios
 ```
 
 The script returns an ordered list of commands that can be applied to the network equipment in order to achieve the target configuration state.
@@ -58,10 +58,12 @@ Requirements
 ============
 netcompare uses the awesome David Michael Pennington's CiscoConfParse library to parse the configuration files.
 More information in [CiscoConfParse](http://www.pennington.net/py/ciscoconfparse/) documentation.
-Be sure to install it before using netcompare:
+It also uses pyyaml library.
+Be sure to install these before using netcompare:
 
 ```
     pip install ciscoconfparse
+    pip install pyyaml
 ```
 
 Documentation

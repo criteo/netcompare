@@ -36,58 +36,43 @@ def cli_parser(argv=None):
     return parser.parse_args(argv)
 
 
+def clean_line(line, vendor):
+    cleaned_lines = []
+    f5_curly_bracket = re.search('^(?P<space>\s*)(?P<begin>.*)\{(?'
+                                 'P<inside>.*)\}(?P<end>.*)$',
+                                 line)
+    if vendor == 'f5' and f5_curly_bracket:
+        cleaned_lines.append(f5_curly_bracket.group('space') +
+                             f5_curly_bracket.group('begin') + "{")
+        cleaned_lines.append(f5_curly_bracket.group('space') +
+                             "  " + f5_curly_bracket.group('inside'))
+        cleaned_lines.append(f5_curly_bracket.group('space') + "}" +
+                             f5_curly_bracket.group('end').
+                             rstrip(' \t\r\n\0'))
+    else:
+        cleaned_lines.append(line.rstrip(' \t\r\n\0'))
+    return cleaned_lines
+
+
 def clean_file(file, vendor, config):
     with open(file) as file_opened:
         list = file_opened.readlines()
 
     list_clean = []
 
-    if vendor == 'vrp':
-        line_parent_sharp = False
-        for line in list:
-            line_clean = line.rstrip(' \t\r\n\0')
-            if line_parent_sharp is False:
-                if line_clean == '#' or line_clean == '!':
-                    line_parent_sharp = True
-                elif re.match('^!.*$', line_clean) or re.match(
-                  '^#.*$', line_clean):
-                    pass
-                elif line_clean == 'return' or line_clean == 'exit':
-                    pass
-                elif line_clean == '':
-                    pass
-                else:
-                    list_clean.append(line_clean)
-            else:
-                if line_clean == '#' or line_clean == '!':
-                    line_parent_sharp = True
-                elif re.match('^!.*$', line_clean) or re.match(
-                  '^#.*$', line_clean):
-                    pass
-                elif line_clean == 'return' or line_clean == 'exit':
-                    pass
-                elif re.match('^\s.*$', line_clean):
-                    line_without_space = re.match('^\s(.*)$', line_clean)
-                    list_clean.append(line_without_space.group(1))
-                elif line_clean == '':
-                    pass
-                else:
-                    list_clean.append(line_clean)
-                    line_parent_sharp = False
-    else:
+    try:
+        config[vendor]['dont_compare']
         for line in list:
             for dont_compare in config[vendor]['dont_compare']:
                 if dont_compare in line:
                     break
             else:
-                f5_curly_bracket = re.search('^(?P<space>\s*)(?P<begin>.*)\{(?P<inside>.*)\}(?P<end>.*)$', line)
-                if vendor == 'f5' and f5_curly_bracket:
-                    list_clean.append(f5_curly_bracket.group('space')+f5_curly_bracket.group('begin')+"{")
-                    list_clean.append(f5_curly_bracket.group('space')+"  "+f5_curly_bracket.group('inside'))
-                    list_clean.append(f5_curly_bracket.group('space')+"}"+f5_curly_bracket.group('end').rstrip(' \t\r\n\0'))
-                else:
-                    list_clean.append(line.rstrip(' \t\r\n\0'))
-    return list_clean
+                list_clean = list_clean + clean_line(line, vendor)
+        return list_clean
+    except:
+        for line in list:
+            list_clean = list_clean + clean_line(line, vendor)
+        return list_clean
 
 
 def print_one_line(line, vendor, config):
