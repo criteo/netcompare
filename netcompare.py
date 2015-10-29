@@ -107,7 +107,8 @@ def netcompare(origin, target, vendor, config):
     result = {}
 
     for line_origin in origin_file.objs:
-        for line_target in target_file.objs:
+        equal_lignes = target_file.find_objects('^'+re.escape(line_origin.text)+'$')
+        for line_target in equal_lignes:
             if line_origin.geneology_text == line_target.geneology_text:
                 break
         else:   # Delete needed
@@ -128,7 +129,8 @@ def netcompare(origin, target, vendor, config):
 
     for line_target in target_file.objs:
         find = 0
-        for line_origin in origin_file.objs:
+        equal_lignes = origin_file.find_objects('^'+re.escape(line_target.text)+'$')
+        for line_origin in equal_lignes:
             if line_origin.geneology_text == line_target.geneology_text:
                 find = 1
         if find == 0:  # Create needed
