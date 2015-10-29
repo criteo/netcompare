@@ -1,4 +1,7 @@
 delete ltm virtual to_delete 
+ltm monitor http http_status 
+    delete interval 4
+    interval 6
 ltm virtual test1 
     delete pool TEST
     new_param new
