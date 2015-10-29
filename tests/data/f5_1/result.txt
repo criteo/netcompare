@@ -1,0 +1,36 @@
+delete ltm virtual to_delete 
+ltm virtual test1 
+    delete pool TEST
+    new_param new
+    pool TEST2
+    profiles 
+        wildcard.new.com 
+            context clientside
+ltm virtual test2 
+    delete param_to_delete del
+    profiles 
+        delete wildcard.test3com 
+ltm virtual to_create 
+    description test2
+    destination 10.1.1.4:https
+    ip-protocol tcp
+    mask 255.255.255.255
+    partition test
+    pool TEST33
+    profiles 
+        /Common/http 
+        /Common/oneconnect2 
+        /Common/tcp-lan-optimized 
+            context serverside
+        tcp-wan-optimized 
+            context clientside
+        wildcard.test.com 
+            context clientside
+        wildcard.test3com 
+            context clientside
+    rules 
+        Default_Content_Empty-HTML
+        Redirect_to_Static
+    source 0.0.0.0/0
+    source-address-translation 
+        type automap
