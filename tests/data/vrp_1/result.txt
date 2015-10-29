@@ -1,0 +1,26 @@
+undo hwtacacs-server template tacacs
+aaa
+ authentication-scheme default
+  undo authentication-mode local hwtacacs
+  authentication-mode local
+ authorization-scheme default
+  undo authorization-mode  local hwtacacs
+  authorization-mode  local
+ domain default
+  undo hwtacacs-server tacacs
+ domain default_admin
+  undo hwtacacs-server tacacs
+ local-user localuser2 password cipher %@%@5ddY+H#\}S5snC$Hj:MYHXBX%@%@
+ local-user localuser2 privilege level 15
+ local-user localuser2 service-type telnet terminal ssh
+interface Ethernet0/0/45
+ undo description server
+ undo port default vlan 20
+ description phone
+ port default vlan 10
+interface Ethernet0/0/47
+ undo description server
+ description pdu
+interface Ethernet0/0/48
+ undo description server
+ description pdu

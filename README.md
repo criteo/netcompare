@@ -4,7 +4,7 @@ netcompare is a python script that compares two Cisco IOS style's configuration 
 It's like a "diff" on steroids, which takes care of command's parent / child relationships.
 This script has been written with network configuration automation in mind, for crappy network equipments that does not support atomic changes.
 
-[![Build Status](https://travis-ci.org/criteo/netcompare.png?branch=master)](https://travis-ci.org/criteo/netcompare)
+[![Build Status](https://travis-ci.org/criteo/netcompare.png?branch=master)](https://travis-ci.org/criteo/netcompare) [![codecov.io](https://codecov.io/github/criteo/netcompare/coverage.svg?branch=master)](https://codecov.io/github/criteo/netcompare?branch=master)
 
 Known to work with
 ------------------
@@ -12,6 +12,7 @@ Known to work with
  * Cisco ASA
  * Dell FTOS
  * Huawei VRP
+ * F5 BigIP LTM
 
 It can also work with these platforms (but they support -at least partially- atomic changes, so there's a better way):
  * Arista EOS (configuration sessions with commit supported in modern EOS releases)
@@ -42,10 +43,13 @@ How-to
 That's quite simple, call netcompare.py with 3 arguments:
  * The origin configuration file
  * The target configuration file
- * The negation keyword used by your platform. Cisco IOS, NXOS, IOS-XR, ASA uses "no", Huawei uses "undo" for example
+ * The OS/Vendor of the equipment's configuration file. It can be for now:
+  * ios: for Cisco IOS-style configurations (Cisco IOS, Dell)
+  * vrp: for Huawei VRP-style configurations
+  * f5: for F5 BigIP LTM-style configurations
 
 ```
-    python netcompare.py tests/sample1.conf tests/sample2.conf no
+    python netcompare.py tests/data/ios_1/origin.conf tests/data/ios_1/target.conf ios
 ```
 
 The script returns an ordered list of commands that can be applied to the network equipment in order to achieve the target configuration state.
@@ -54,10 +58,12 @@ Requirements
 ============
 netcompare uses the awesome David Michael Pennington's CiscoConfParse library to parse the configuration files.
 More information in [CiscoConfParse](http://www.pennington.net/py/ciscoconfparse/) documentation.
-Be sure to install it before using netcompare:
+It also uses pyyaml library.
+Be sure to install these before using netcompare:
 
 ```
     pip install ciscoconfparse
+    pip install pyyaml
 ```
 
 Documentation
@@ -76,3 +82,4 @@ Pull requests are warmly welcome :)
 Authors
 =======
  * François Fanuel ([f.fanuel@criteo.com](mailto:f.fanuel@criteo.com))
+ * Cédric Paillet ([c.paillet@criteo.com](mailto:c.paillet@criteo.com))

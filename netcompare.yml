@@ -7,8 +7,6 @@ ios:
 vrp:
   no_command: "undo"
   CiscoConfParse_syntax: ios
-  dont_compare:
-    - "password"
 f5:
   no_command: delete
   CiscoConfParse_syntax: junos

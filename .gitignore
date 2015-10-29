@@ -1,1 +1,6 @@
 .DS_Store
+*.pyc
+__pycache__
+.cache
+.coverage
+htmlcov
