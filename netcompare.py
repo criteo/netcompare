@@ -89,11 +89,8 @@ def print_one_line(line, vendor, config):
 
 def print_line(d, vendor, config, depth=0):
     for k, v in sorted(d.items(), key=lambda x: x[0]):
-        if isinstance(v, dict):
-            print_one_line(k, vendor, config)
-            print_line(v, vendor, config, depth+1)
-        else:
-            print "%s %s" % (k[0], v)   # never go here
+        print_one_line(k, vendor, config)
+        print_line(v, vendor, config, depth+1)
 
 
 def netcompare(origin, target, vendor, config):
