@@ -13,6 +13,8 @@ aaa
  local-user localuser2 password cipher %@%@5ddY+H#\}S5snC$Hj:MYHXBX%@%@
  local-user localuser2 privilege level 15
  local-user localuser2 service-type telnet terminal ssh
+interface Ethernet0/0/1
+ icmp redirect send
 interface Ethernet0/0/45
  undo description server
  undo port default vlan 20

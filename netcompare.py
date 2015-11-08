@@ -77,11 +77,16 @@ def clean_file(file, vendor, config):
 
 def print_one_line(line, vendor, config):
     if line[0] == 'NO':
-        line_text_without_no = re.match("^(\s*)(.*)", line[1])
-        cmd = (line_text_without_no.group(1) +
-               config[vendor]['no_command'] +
-               " " +
-               line_text_without_no.group(2))
+        line_text_no = re.match("^(\s*)" +
+                                config[vendor]['no_command'] +
+                                " (.*)", line[1])
+        if line_text_no:
+            cmd = (line_text_no.group(1) + line_text_no.group(2))
+        else:
+            line_text_without_no = re.match("^(\s*)(.*)", line[1])
+            cmd = (line_text_without_no.group(1) +
+                   config[vendor]['no_command'] + " " +
+                   line_text_without_no.group(2))
         print ("%s" % cmd)
     else:
         print ("%s" % line[1])

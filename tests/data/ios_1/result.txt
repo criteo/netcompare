@@ -1,5 +1,8 @@
 no hostname Foo
+cdp run
 hostname Bar
+interface ATM0/0
+ cdp enable
 interface ATM0/0.32 point-to-point
  pvc 0/32
   no tata
