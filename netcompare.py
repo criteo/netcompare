@@ -25,29 +25,32 @@ from ciscoconfparse import CiscoConfParse
 
 def cli_parser(argv=None):
     parser = argparse.ArgumentParser(
-        description=('Generating configuration commands by finding differences'
-                     ' between two Cisco IOS style configuration files'))
-    parser.add_argument('origin', metavar='origin',
+        description='Generating configuration commands by finding differences'
+                    ' between two Cisco IOS style configuration files')
+    parser.add_argument('--origin', metavar='origin',
                         type=str, help='Origin configuration file')
-    parser.add_argument('target', metavar='target',
+    parser.add_argument('--target', metavar='target',
                         type=str, help='Target configuration file')
-    parser.add_argument('vendor', metavar='Vendor or OS definition',
-                        type=str, help='vendor')
+    parser.add_argument('--vendor', help='Vendor or OS definition',
+                        type=str, metavar='vendor')
+    parser.add_argument('--config', metavar='config',
+                        type=str, help='config file name',
+                        default='netcompare.yml')
     return parser.parse_args(argv)
 
 
 def clean_line(line, vendor):
     cleaned_lines = []
-    f5_curly_bracket = re.search('^(?P<space>\s*)(?P<begin>.*)\{(?'
-                                 'P<inside>.*)\}(?P<end>.*)$',
-                                 line)
-    if vendor == 'f5' and f5_curly_bracket:
-        cleaned_lines.append(f5_curly_bracket.group('space') +
-                             f5_curly_bracket.group('begin') + "{")
-        cleaned_lines.append(f5_curly_bracket.group('space') +
-                             "  " + f5_curly_bracket.group('inside'))
-        cleaned_lines.append(f5_curly_bracket.group('space') + "}" +
-                             f5_curly_bracket.group('end').
+    tmsh_curly_bracket = re.search('^(?P<space>\s*)(?P<begin>.*)\{(?'
+                                   'P<inside>.*)\}(?P<end>.*)$',
+                                   line)
+    if vendor == 'tmsh' and tmsh_curly_bracket:
+        cleaned_lines.append(tmsh_curly_bracket.group('space') +
+                             tmsh_curly_bracket.group('begin') + "{")
+        cleaned_lines.append(tmsh_curly_bracket.group('space') +
+                             "  " + tmsh_curly_bracket.group('inside'))
+        cleaned_lines.append(tmsh_curly_bracket.group('space') + "}" +
+                             tmsh_curly_bracket.group('end').
                              rstrip(' \t\r\n\0'))
     else:
         cleaned_lines.append(line.rstrip(' \t\r\n\0'))
@@ -148,7 +151,7 @@ def netcompare(origin, target, vendor, config):
 
 def main(argv=None):
     args = cli_parser(argv)
-    with open('netcompare.yml', 'r') as f:
+    with open(args.config, 'r') as f:
         config = yaml.load(f)
 
     origin_list = clean_file(args.origin, args.vendor, config)
