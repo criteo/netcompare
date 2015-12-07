@@ -35,7 +35,7 @@ def cli_parser(argv=None):
                         type=str, metavar='vendor')
     parser.add_argument('--config', metavar='config',
                         type=str, help='config file name',
-                        default='netcompare.yml')
+                        default='etc/netcompare.yml')
     return parser.parse_args(argv)
 
 
