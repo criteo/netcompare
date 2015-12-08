@@ -17,7 +17,7 @@ import os
 
 import pytest
 
-from netcompare import main
+from netcompare import netcompare
 
 
 @pytest.fixture
@@ -35,7 +35,11 @@ def test_assert(capsys, directory, data_dir):
     target = os.path.join(data_dir, directory, 'target.conf')
     vendor = directory.split('_', 1)[0]
     result = os.path.join(data_dir, directory, 'result.txt')
-    main(["--origin", origin, "--target", target, "--vendor", vendor])
+    netcompare.main(
+                     ["--origin", origin,
+                      "--target", target,
+                      "--vendor", vendor]
+                   )
     with open(result) as file_opened:
         result = file_opened.read()
     out, err = capsys.readouterr()

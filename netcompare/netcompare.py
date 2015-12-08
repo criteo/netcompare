@@ -35,7 +35,7 @@ def cli_parser(argv=None):
                         type=str, metavar='vendor')
     parser.add_argument('--config', metavar='config',
                         type=str, help='config file name',
-                        default='netcompare.yml')
+                        default='etc/netcompare.yml')
     return parser.parse_args(argv)
 
 
@@ -78,7 +78,7 @@ def clean_file(file, vendor, config):
         return list_clean
 
 
-def print_one_line(line, vendor, config):
+def get_one_line(line, vendor, config):
     if line[0] == 'NO':
         line_text_no = re.match("^(\s*)" +
                                 config[vendor]['no_command'] +
@@ -90,15 +90,17 @@ def print_one_line(line, vendor, config):
             cmd = (line_text_without_no.group(1) +
                    config[vendor]['no_command'] + " " +
                    line_text_without_no.group(2))
-        print ("%s" % cmd)
+        return cmd
     else:
-        print ("%s" % line[1])
+        return line[1]
 
 
-def print_line(d, vendor, config, depth=0):
+def get_diff_lines(d, vendor, config, depth=0):
+    result = []
     for k, v in sorted(d.items(), key=lambda x: x[0]):
-        print_one_line(k, vendor, config)
-        print_line(v, vendor, config, depth+1)
+        result.append(get_one_line(k, vendor, config))
+        result.extend(get_diff_lines(v, vendor, config, depth+1))
+    return result
 
 
 def netcompare(origin, target, vendor, config):
@@ -159,7 +161,9 @@ def main(argv=None):
 
     display_commands = netcompare(origin_list,
                                   target_list, args.vendor, config)
-    print_line(display_commands, args.vendor, config)
+    result = get_diff_lines(display_commands, args.vendor, config)
+    for line in result:
+        print line
 
 
 if __name__ == '__main__':
