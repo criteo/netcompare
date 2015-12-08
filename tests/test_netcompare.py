@@ -36,10 +36,10 @@ def test_assert(capsys, directory, data_dir):
     vendor = directory.split('_', 1)[0]
     result = os.path.join(data_dir, directory, 'result.txt')
     netcompare.main(
-                     ["--origin", origin,
-                      "--target", target,
-                      "--vendor", vendor]
-                   )
+        ["--origin", origin,
+         "--target", target,
+         "--vendor", vendor]
+        )
     with open(result) as file_opened:
         result = file_opened.read()
     out, err = capsys.readouterr()
