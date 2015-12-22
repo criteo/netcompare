@@ -47,8 +47,8 @@ def clean_line(line, vendor):
                              tmsh_curly_bracket.group('begin') + "{")
         cleaned_lines.append(tmsh_curly_bracket.group('space') +
                              "  " + tmsh_curly_bracket.group('inside'))
-        cleaned_lines.append(tmsh_curly_bracket.group('space') + "}" +
-                             tmsh_curly_bracket.group('end').
+        cleaned_lines.append(tmsh_curly_bracket.group('space') + "}")
+        cleaned_lines.append(tmsh_curly_bracket.group('end').
                              rstrip(' \t\r\n\0'))
     else:
         cleaned_lines.append(line.rstrip(' \t\r\n\0'))
