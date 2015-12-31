@@ -39,17 +39,63 @@ def cli_parser(argv=None):
 
 def clean_line(line, vendor):
     cleaned_lines = []
-    tmsh_curly_bracket = re.search('^(?P<space>\s*)(?P<begin>.*)\{(?'
-                                   'P<inside>.*)\}(?P<end>.*)$',
-                                   line)
-    if vendor == 'tmsh' and tmsh_curly_bracket:
-        cleaned_lines.append(tmsh_curly_bracket.group('space') +
-                             tmsh_curly_bracket.group('begin') + "{")
-        cleaned_lines.append(tmsh_curly_bracket.group('space') +
-                             "  " + tmsh_curly_bracket.group('inside'))
-        cleaned_lines.append(tmsh_curly_bracket.group('space') + "}")
-        cleaned_lines.append(tmsh_curly_bracket.group('end').
-                             rstrip(' \t\r\n\0'))
+    if vendor == 'tmsh':
+        # Remove text after a # (CiscoConfParse crash if there is a
+        #  bracket in a comment
+        remove_comment = re.search('(?P<before_comment>[^\#]*)\#', line)
+        if remove_comment:
+            line = remove_comment.group('before_comment')
+        # match "   begin{inside}end"
+        tmsh_curly_bracket = re.search(
+            '^(?P<space>\s*)(?P<begin>[^\{]*)(?P<open>[\{])(?'
+            'P<inside>.*)(?P<close>[\}])(?P<end>[^\}]*)$',
+            line)
+        # match "   begin } end"
+        tmsh_curly_bracket_left = re.search(
+            '^(?P<space>\s*)(?P<begin>[^\{\}]*)'
+            '(?P<bracket>[\}\{])(?'
+            'P<end>.+)$',
+            line)
+        if tmsh_curly_bracket:
+            # replace
+            # "    begin{inside}end"
+            # by
+            # "    begin
+            #            {
+            #            inside
+            #            }
+            #     end
+            cleaned_lines.append(tmsh_curly_bracket.group('space') +
+                                 tmsh_curly_bracket.group('begin') +
+                                 tmsh_curly_bracket.group('open'))
+            cleaned_lines = (cleaned_lines +
+                             clean_line(tmsh_curly_bracket.group('space') +
+                                        "  " +
+                                        tmsh_curly_bracket.
+                                        group('inside'),
+                                        vendor))
+            cleaned_lines.append(tmsh_curly_bracket.group('space') +
+                                 tmsh_curly_bracket.group('close'))
+            cleaned_lines.append(tmsh_curly_bracket.group('end').
+                                 rstrip(' \t\r\n\0'))
+        elif tmsh_curly_bracket_left:
+            # replace
+            # "   begin } end"
+            # by
+            # "   begin }
+            #     end
+            cleaned_lines.append(tmsh_curly_bracket_left.group('space') +
+                                 tmsh_curly_bracket_left.group('begin') +
+                                 tmsh_curly_bracket_left.group('bracket'))
+            cleaned_lines = (cleaned_lines +
+                             clean_line(tmsh_curly_bracket_left.
+                                        group('space') +
+                                        "  " +
+                                        tmsh_curly_bracket_left.
+                                        group('end').rstrip(' \t\r\n\0'),
+                                        vendor))
+        else:
+            cleaned_lines.append(line.rstrip(' \t\r\n\0'))
     else:
         cleaned_lines.append(line.rstrip(' \t\r\n\0'))
     return cleaned_lines
@@ -68,11 +114,13 @@ def clean_file(file, vendor, config):
                 if dont_compare in line:
                     break
             else:
-                list_clean = list_clean + clean_line(line, vendor)
+                list_clean = (list_clean +
+                              clean_line(line, vendor))
         return list_clean
     except:
         for line in list:
-            list_clean = list_clean + clean_line(line, vendor)
+            list_clean = (list_clean +
+                          clean_line(line, vendor))
         return list_clean
 
 
@@ -102,15 +150,19 @@ def get_diff_lines(d, vendor, config, depth=0):
 
 
 def netcompare(origin, target, vendor, config):
-    origin_file = (CiscoConfParse(origin,
-                   syntax=config[vendor]['CiscoConfParse_syntax'],
-                   factory=False))
-    target_file = (CiscoConfParse(target,
-                   syntax=config[vendor]['CiscoConfParse_syntax'],
-                   factory=False))
-
+    origin_file = CiscoConfParse(origin,
+                                 comment=config[vendor]
+                                               ['CiscoConfParse_comment'],
+                                 syntax=config[vendor]
+                                              ['CiscoConfParse_syntax'],
+                                 factory=False)
+    target_file = CiscoConfParse(target,
+                                 comment=config[vendor]
+                                               ['CiscoConfParse_comment'],
+                                 syntax=config[vendor]
+                                              ['CiscoConfParse_syntax'],
+                                 factory=False)
     result = {}
-
     for line_origin in origin_file.objs:
         eq_lines = (target_file.find_objects(
                     '^' + re.escape(line_origin.text) + '$'))

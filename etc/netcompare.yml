@@ -4,11 +4,14 @@ ios:
   dont_compare:
     - "ntp clock-period"
     - "Current Configuration ..."
+  CiscoConfParse_comment: "!"
 vrp:
   no_command: "undo"
   CiscoConfParse_syntax: ios
+  CiscoConfParse_comment: "!"
 tmsh:
   no_command: delete
   CiscoConfParse_syntax: junos
+  CiscoConfParse_comment: "#"
   dont_compare:
     - "vs-index"
