@@ -1,47 +1,49 @@
-delete ltm irule test_comment 
-delete ltm irule to_delete_toto1 
-delete ltm virtual to_delete 
-ltm irule not_equal_toto1 
+delete ltm irule test_comment
+delete ltm irule to_delete_toto1
+delete ltm virtual to_delete
+ltm irule not_equal_toto1
     testing
         un
             deux
                 delete trois33
                 trois
-ltm monitor http http_status 
+ltm monitor http http_status
     delete interval 4
     interval 6
-ltm virtual test1 
+ltm virtual test1
     delete pool TEST
     new_param new
     pool TEST2
-    profiles 
-        wildcard.new.com 
+    profiles
+        wildcard.new.com
             context clientside
-ltm virtual test2 
+ltm virtual test2
     delete param_to_delete del
-    profiles 
-        delete wildcard.test3com 
-ltm virtual to_create 
+    profiles
+        delete wildcard.test3com
+ltm virtual to_create
     description test2
     destination 10.1.1.4:https
     ip-protocol tcp
     mask 255.255.255.255
     partition test
     pool TEST33
-    profiles 
+    profiles
         /Common/http
         /Common/oneconnect2
-        /Common/tcp-lan-optimized 
+        /Common/tcp-lan-optimized
             context serverside
-        tcp-wan-optimized 
+        tcp-wan-optimized
             context clientside
-        wildcard.test.com 
+        wildcard.test.com
             context clientside
-        wildcard.test3com 
+        wildcard.test3com
             context clientside
-    rules 
+    rules
         Default_Content_Empty-HTML
         Redirect_to_Static
     source 0.0.0.0/0
-    source-address-translation 
+    source-address-translation
         type automap
+test final
+    change
