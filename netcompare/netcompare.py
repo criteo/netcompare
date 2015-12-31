@@ -45,55 +45,23 @@ def clean_line(line, vendor):
         remove_comment = re.search('(?P<before_comment>[^\#]*)\#', line)
         if remove_comment:
             line = remove_comment.group('before_comment')
-        # match "   begin{inside}end"
-        tmsh_curly_bracket = re.search(
-            '^(?P<space>\s*)(?P<begin>[^\{]*)(?P<open>[\{])(?'
-            'P<inside>.*)(?P<close>[\}])(?P<end>[^\}]*)$',
-            line)
         # match "   begin } end"
         tmsh_curly_bracket_left = re.search(
-            '^(?P<space>\s*)(?P<begin>[^\{\}]*)'
+            '^(?P<space>\s*)(?P<begin>.*)'
             '(?P<bracket>[\}\{])(?'
-            'P<end>.+)$',
+            'P<end>[^\}\{].+)$',
             line)
-        if tmsh_curly_bracket:
-            # replace
-            # "    begin{inside}end"
-            # by
-            # "    begin
-            #            {
-            #            inside
-            #            }
-            #     end
-            cleaned_lines.append(tmsh_curly_bracket.group('space') +
-                                 tmsh_curly_bracket.group('begin') +
-                                 tmsh_curly_bracket.group('open'))
-            cleaned_lines = (cleaned_lines +
-                             clean_line(tmsh_curly_bracket.group('space') +
-                                        "  " +
-                                        tmsh_curly_bracket.
-                                        group('inside'),
-                                        vendor))
-            cleaned_lines.append(tmsh_curly_bracket.group('space') +
-                                 tmsh_curly_bracket.group('close'))
-            cleaned_lines.append(tmsh_curly_bracket.group('end').
-                                 rstrip(' \t\r\n\0'))
-        elif tmsh_curly_bracket_left:
+        if tmsh_curly_bracket_left:
             # replace
             # "   begin } end"
             # by
             # "   begin }
             #     end
-            cleaned_lines.append(tmsh_curly_bracket_left.group('space') +
-                                 tmsh_curly_bracket_left.group('begin') +
-                                 tmsh_curly_bracket_left.group('bracket'))
-            cleaned_lines = (cleaned_lines +
-                             clean_line(tmsh_curly_bracket_left.
-                                        group('space') +
-                                        "  " +
-                                        tmsh_curly_bracket_left.
-                                        group('end').rstrip(' \t\r\n\0'),
-                                        vendor))
+            cleaned_lines = clean_line(tmsh_curly_bracket_left.
+                                       group('begin'), vendor)
+            cleaned_lines.append(tmsh_curly_bracket_left.group('bracket'))
+            cleaned_lines.append(tmsh_curly_bracket_left.group('end').
+                                 rstrip(' \t\r\n\0'))
         else:
             cleaned_lines.append(line.rstrip(' \t\r\n\0'))
     else:
