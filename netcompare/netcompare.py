@@ -49,7 +49,7 @@ def clean_line(line, vendor):
         tmsh_curly_bracket_left = re.search(
             '^(?P<space>\s*)(?P<begin>.*)'
             '(?P<bracket>[\}\{])(?'
-            'P<end>[^\}\{].+)$',
+            'P<end>[^\}\{]+)$',
             line)
         if tmsh_curly_bracket_left:
             # replace
