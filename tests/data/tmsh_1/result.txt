@@ -1,4 +1,12 @@
+delete ltm irule test_comment 
+delete ltm irule to_delete_toto1 
 delete ltm virtual to_delete 
+ltm irule not_equal_toto1 
+    testing 
+        un 
+            deux 
+                delete trois33
+                trois
 ltm monitor http http_status 
     delete interval 4
     interval 6
