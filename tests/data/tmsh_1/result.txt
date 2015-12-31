@@ -2,9 +2,9 @@ delete ltm irule test_comment
 delete ltm irule to_delete_toto1 
 delete ltm virtual to_delete 
 ltm irule not_equal_toto1 
-    testing 
-        un 
-            deux 
+    testing
+        un
+            deux
                 delete trois33
                 trois
 ltm monitor http http_status 
@@ -29,8 +29,8 @@ ltm virtual to_create
     partition test
     pool TEST33
     profiles 
-        /Common/http 
-        /Common/oneconnect2 
+        /Common/http
+        /Common/oneconnect2
         /Common/tcp-lan-optimized 
             context serverside
         tcp-wan-optimized 
