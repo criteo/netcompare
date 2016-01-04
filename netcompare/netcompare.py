@@ -40,7 +40,7 @@ def cli_parser(argv=None):
 def clean_line(line, vendor):
     cleaned_lines = []
     if vendor == 'tmsh':
-        # Remove text after a # (CiscoConfParse crash if there is a
+        # Remove text after a # (Because CiscoConfParse crash if there is a
         #  bracket in a comment
         remove_comment = re.search('(?P<before_comment>[^\#]*)\#', line)
         if remove_comment:
@@ -49,7 +49,7 @@ def clean_line(line, vendor):
         tmsh_curly_bracket_left = re.search(
             '^(?P<space>\s*)(?P<begin>.*)'
             '(?P<bracket>[\}\{])(?'
-            'P<end>[^\}\{]+)$',
+            'P<end>[^\}\{]*)$',
             line)
         if tmsh_curly_bracket_left:
             # replace
