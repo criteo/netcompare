@@ -1,2 +1,2 @@
-ciscoconfparse
+git+https://github.com/criteo-forks/ciscoconfparse@master
 pyyaml
